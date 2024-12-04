@@ -4,7 +4,7 @@ from environ import Env
 BASE_DIR = Path(__file__).resolve().parent.parent.parent 
 APP_DIR = BASE_DIR / "core_apps"
 
-# Env Setup 
+# Env Setup
 env = Env()
 ENVIRONMENT_TYPE = env("ENVIRONMENT_TYPE", default=".dev")
 env.read_env(Path(str(BASE_DIR)) / f".envs/{ENVIRONMENT_TYPE}/.django")
@@ -36,6 +36,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTH_APPS + LOCAL_APPS
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -63,16 +64,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "Docker_Todo_App.wsgi.application"
 
-# NOTE: Local Database for Test 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
+# NOTE: Local Database for Test
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 
 # Docker Database
-# DATABASES = {"default": env.db("DATABASE_URL")}
+DATABASES = {"default": env.db("DATABASE_URL")}
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -89,7 +90,6 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
-
 
 
 LANGUAGE_CODE = "en-us"
