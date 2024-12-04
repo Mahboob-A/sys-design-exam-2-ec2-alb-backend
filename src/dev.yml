@@ -43,7 +43,7 @@ services:
       - dev_todoapp_static_volume:/app/staticfiles/
       - dev_todoapp_media_volume:/app/mediafiles/
     ports: 
-      - "8080:80"
+      - "9090:80"
     networks: 
       - dev-todoapp-service-network
  
