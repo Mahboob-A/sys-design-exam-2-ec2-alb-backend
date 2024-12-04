@@ -1,0 +1,60 @@
+services: 
+  todoapp-api: &api   
+    restart: always 
+    build: 
+      context: . 
+      dockerfile: ./docker/dev/django/Dockerfile
+    image: todoapp-api-image
+    container_name: todo_app_api_1
+    volumes: 
+      - dev_todoapp_static_volume:/home/todoapp/app/staticfiles/
+      - dev_todoapp_media_volume:/home/todoapp/app/mediafiles/
+    env_file: 
+      - ./.envs/.dev/.django
+      - ./.envs/.dev/.postgres
+    depends_on: 
+      - postgres
+    command: /start.sh  
+    networks: 
+      - dev-todoapp-service-network
+
+  postgres: 
+    build: 
+      context: . 
+      dockerfile: ./docker/dev/postgres/Dockerfile
+    image: todoapp-pg-image
+    container_name: todo_app_pg_1
+    volumes: 
+      - dev_todoapp_postgres_data:/var/lib/postgresql/data
+    env_file: 
+      - ./.envs/.dev/.postgres 
+    networks: 
+      - dev-todoapp-service-network
+
+  nginx: 
+    build: 
+      context: . 
+      dockerfile: ./docker/dev/nginx/Dockerfile
+    restart: always
+    container_name: todo_app_nginx_1
+    depends_on: 
+      - todoapp-api 
+    volumes: 
+      - dev_todoapp_static_volume:/app/staticfiles/
+      - dev_todoapp_media_volume:/app/mediafiles/
+    ports: 
+      - "8080:80"
+    networks: 
+      - dev-todoapp-service-network
+ 
+networks: 
+  dev-todoapp-service-network:
+    external: true 
+
+volumes: 
+  dev_todoapp_static_volume: {}
+  dev_todoapp_media_volume: {}
+  dev_todoapp_postgres_data: {}
+
+
+  

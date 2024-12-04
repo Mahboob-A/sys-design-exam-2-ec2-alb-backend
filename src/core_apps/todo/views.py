@@ -88,7 +88,7 @@ class TodoAPIView(APIView):
                 task.delete()
                 return Response(
                     {"status": "success", "message": f"Task Deleted Successfully. ID: {task_id}"},
-                    status=status.HTTP_200_OK,
+                    status=status.HTTP_204_NO_CONTENT,  
                 )
             except TodoTasks.DoesNotExist:
                 return Response(
