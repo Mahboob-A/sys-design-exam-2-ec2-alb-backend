@@ -1,0 +1,11 @@
+name: pulumi-poc
+description: testing pulumi for poridhi exam 02, module 06-07 on 051224 Thursday, 04.00 pm
+runtime:
+  name: python
+  options:
+    toolchain: pip
+    virtualenv: venv
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: aws-python
