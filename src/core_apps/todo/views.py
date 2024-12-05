@@ -8,7 +8,7 @@ from rest_framework.permissions import AllowAny
 
 from core_apps.todo.models import TodoTasks
 from core_apps.todo.serializers import TodoTaskSerializer
-
+from core_apps.common.utils import get_current_host
 
 
 class TodoAPIView(APIView):
@@ -17,13 +17,17 @@ class TodoAPIView(APIView):
     A Simple Todo App
     """
 
-    permission_classes = [AllowAny]  # focus on the functionality rather than authentication as per the exam 
+    permission_classes = [
+        AllowAny
+    ]  # focus on the functionality rather than authentication as per the exam
 
     def get(self, request, task_id=None, format=None):
+
+        host = request.get_host()
         if task_id:
             try:
                 task = TodoTasks.objects.get(id=task_id)
-                serializer = TodoTaskSerializer(task)
+                serializer = TodoTaskSerializer(task, context={"host": host})
                 return Response(
                     {"status": "success", "data": serializer.data},
                     status=status.HTTP_200_OK,
@@ -38,7 +42,9 @@ class TodoAPIView(APIView):
                 )
         else:
             tasks = TodoTasks.objects.all()
-            serializer = TodoTaskSerializer(tasks, many=True)
+            serializer = TodoTaskSerializer(
+                tasks, many=True, context={"host": host}
+            )
             return Response(
                 {"status": "success", "data": serializer.data},
                 status=status.HTTP_200_OK,
@@ -49,7 +55,10 @@ class TodoAPIView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(
-                {"status": "success", "message": f"Task Created Successfully. ID: {serializer.data['id']}"},
+                {
+                    "status": "success",
+                    "message": f"Task Created Successfully. ID: {serializer.data['id']}",
+                },
                 status=status.HTTP_201_CREATED,
             )
         return Response(
@@ -65,7 +74,10 @@ class TodoAPIView(APIView):
                 if serializer.is_valid(raise_exception=True):
                     serializer.save()
                     return Response(
-                        {"status": "success", "message": f"Task Updated Successfully. ID: {task_id}"},
+                        {
+                            "status": "success",
+                            "message": f"Task Updated Successfully. ID: {task_id}",
+                        },
                         status=status.HTTP_200_OK,
                     )
             except TodoTasks.DoesNotExist:
@@ -80,15 +92,18 @@ class TodoAPIView(APIView):
             {"status": "error", "message": "Task ID is required"},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
     def delete(self, request, task_id=None, format=None):
         if task_id:
             try:
                 task = TodoTasks.objects.get(id=task_id)
                 task.delete()
                 return Response(
-                    {"status": "success", "message": f"Task Deleted Successfully. ID: {task_id}"},
-                    status=status.HTTP_204_NO_CONTENT,  
+                    {
+                        "status": "success",
+                        "message": f"Task Deleted Successfully. ID: {task_id}",
+                    },
+                    status=status.HTTP_204_NO_CONTENT,
                 )
             except TodoTasks.DoesNotExist:
                 return Response(
