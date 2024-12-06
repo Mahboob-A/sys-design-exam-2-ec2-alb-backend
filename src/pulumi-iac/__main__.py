@@ -69,6 +69,7 @@ rtb_sb_association2 = aws.ec2.RouteTableAssociation("porisdi-rta-1b",
 
 # C. EC2 Instance
 
+# NOTE: need to recreate the key pair depending on host being used (if poridhi code-server is used, regenerate it, and share the pub key)
 key_pair = aws.ec2.KeyPair(
     "poridhi-exam-ec2-keypair",  # can be any name
     key_name="poridhi-exam-ec2-keypair",
@@ -120,24 +121,35 @@ ami_id = aws.ec2.get_ami(most_recent=True,
         ).id
 
 
-ec2_instance1 = aws.ec2.Instance("poridhi-exam-instance-1a", 
+ec2_instance1 = aws.ec2.Instance("poridhi-exam-instance-backend-1a", 
         instance_type="t2.micro", 
         ami=ami_id, 
         subnet_id=subnet1.id, 
         vpc_security_group_ids=[security_group.id],
         key_name=key_pair.key_name,
         associate_public_ip_address=True, 
-        tags={"Name": "poridhi-exam-instance-1a"}
+        tags={"Name": "poridhi-exam-instance-backend-1a"}
 )
 
 
-ec2_instance2 = aws.ec2.Instance("poridhi-exam-instance-1b", 
+ec2_instance2 = aws.ec2.Instance("poridhi-exam-instance-backend-1b", 
         instance_type="t2.micro", 
         ami=ami_id, 
         subnet_id=subnet2.id, 
         vpc_security_group_ids=[security_group.id],
         key_name=key_pair.key_name,
-        tags={"Name": "poridhi-exam-instance-1b"}
+        associate_public_ip_address=True, 
+        tags={"Name": "poridhi-exam-instance-backend-1b"}
+)
+
+ec2_instance2 = aws.ec2.Instance("poridhi-exam-instance-client-1a", 
+        instance_type="t2.micro", 
+        ami=ami_id, 
+        subnet_id=subnet2.id, 
+        vpc_security_group_ids=[security_group.id],
+        key_name=key_pair.key_name,
+        associate_public_ip_address=True, 
+        tags={"Name": "poridhi-exam-instance-client-1a"}
 )
 
 
