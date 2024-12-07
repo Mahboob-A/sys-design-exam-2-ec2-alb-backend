@@ -64,7 +64,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "Docker_Todo_App.wsgi.application"
 
-# NOTE: Local Database for Test
+# NOTE: Populate DB before deploying the django app
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.sqlite3",
@@ -73,7 +73,19 @@ WSGI_APPLICATION = "Docker_Todo_App.wsgi.application"
 # }
 
 # Docker Database
+# prod db | running in aws private sn in docker container
 DATABASES = {"default": env.db("DATABASE_URL")}
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME':  env("POSTGRES_DB"),
+#         'USER': env("POSTGRES_USER"),
+#         'PASSWORD': env("POSTGRES_PASSWORD"),
+#         'HOST': env("POSTGRES_HOST"),
+#         'PORT': '5432',
+#     }
+# }
 
 
 AUTH_PASSWORD_VALIDATORS = [
