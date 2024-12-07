@@ -12,25 +12,13 @@ services:
     env_file: 
       - ./.envs/.dev/.django
       - ./.envs/.dev/.postgres
-    depends_on: 
-      - postgres
     command: /start.sh  
     networks: 
       - dev-todoapp-service-network
 
 # NOTE: DB will be deployed in other AZ separately.  
   # postgres: 
-  #   build: 
-  #     context: . 
-  #     dockerfile: ./docker/dev/postgres/Dockerfile
-  #   image: todoapp-pg-image
-  #   container_name: todo_app_pg_1
-  #   volumes: 
-  #     - dev_todoapp_postgres_data:/var/lib/postgresql/data
-  #   env_file: 
-  #     - ./.envs/.dev/.postgres 
-  #   networks: 
-  #     - dev-todoapp-service-network
+    #  sudo docker compose -p todoapp-dev -f dev.yml up --build -d --remove-orphans
 
   nginx: 
     build: 
