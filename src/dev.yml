@@ -7,7 +7,7 @@ services:
     image: todoapp-api-image
     container_name: todo_app_api_1
     volumes: 
-      - dev_todoapp_static_volume:/home/todoapp/app/staticfiles/
+      - dev_todoapp_static_volume:/home/todoapp/app/staticfiles/  # should use S3, but opting out now for simplicity
       - dev_todoapp_media_volume:/home/todoapp/app/mediafiles/
     env_file: 
       - ./.envs/.dev/.django
@@ -18,18 +18,19 @@ services:
     networks: 
       - dev-todoapp-service-network
 
-  postgres: 
-    build: 
-      context: . 
-      dockerfile: ./docker/dev/postgres/Dockerfile
-    image: todoapp-pg-image
-    container_name: todo_app_pg_1
-    volumes: 
-      - dev_todoapp_postgres_data:/var/lib/postgresql/data
-    env_file: 
-      - ./.envs/.dev/.postgres 
-    networks: 
-      - dev-todoapp-service-network
+# NOTE: DB will be deployed in other AZ separately.  
+  # postgres: 
+  #   build: 
+  #     context: . 
+  #     dockerfile: ./docker/dev/postgres/Dockerfile
+  #   image: todoapp-pg-image
+  #   container_name: todo_app_pg_1
+  #   volumes: 
+  #     - dev_todoapp_postgres_data:/var/lib/postgresql/data
+  #   env_file: 
+  #     - ./.envs/.dev/.postgres 
+  #   networks: 
+  #     - dev-todoapp-service-network
 
   nginx: 
     build: 
@@ -40,13 +41,14 @@ services:
     depends_on: 
       - todoapp-api 
     volumes: 
-      - dev_todoapp_static_volume:/app/staticfiles/
+      - dev_todoapp_static_volume:/app/staticfiles/  # should use S3, but opting out now for simplicity
       - dev_todoapp_media_volume:/app/mediafiles/
     ports: 
-      - "9090:80"
+      - "80:80"
     networks: 
       - dev-todoapp-service-network
  
+#  NOTE: Create the externet network on the server 
 networks: 
   dev-todoapp-service-network:
     external: true 
