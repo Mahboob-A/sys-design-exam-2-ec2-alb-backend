@@ -11,7 +11,12 @@ The below script creates an aws infra environment with the below specs:
 1 vpc, 2 subnets, 1 igw, 1 rtb, 2 ec2 instances, 1 alb, 1 target group, 1 listener, key pair and all the attachments. 
 
 '''
+"""
+task: 
 
+1. create another subnet  for client, put the cient instance in this new subnet. 
+2. allow 8000 and 9090, 8080, and some other pg related ports in the ingress route. 
+"""
 
 # A. Infra
 
@@ -22,7 +27,8 @@ vpc = aws.ec2.Vpc('poridhi-exam-dev-vpc',
                 enable_dns_support=True, 
                 tags={"Name": "poridhi-exam-dev-vpc"}
         )
-
+# NOTE: need to change the availability zone as per the region. I am using Mumbai region as I have account in Mumbai region,
+# but change the availability zone as per the region.
 # subnet
 subnet1 = aws.ec2.Subnet("poridhi-exam-sb-1a", 
                 vpc_id=vpc.id, 
@@ -153,7 +159,7 @@ ec2_instance2 = aws.ec2.Instance("poridhi-exam-instance-client-1a",
 )
 
 
-# D. Target gorup and alb 
+# D. Target gorup and alb
 
 target_group_tg = aws.lb.TargetGroup("poridhi-exam-tg", 
         vpc_id=vpc.id, 
@@ -182,7 +188,7 @@ tg_attachment2 = aws.lb.TargetGroupAttachment("poridhi-exam-tg-attachment-1b",
         port=80
 )
 
-# alb 
+# alb
 alb = aws.lb.LoadBalancer("poridhi-exam-alb", 
         load_balancer_type="application",
         security_groups=[security_group.id],
@@ -200,14 +206,12 @@ listener = aws.lb.Listener("poridhi-exam-listener",
 )
 
 
-
-
-# infra 
+# infra
 pulumi.export("vpc_id", vpc.id)
 pulumi.export("subnet_1_id", subnet1.id)
 pulumi.export("subnet_2_id", subnet2.id)
 
-# netwokring 
+# netwokring
 pulumi.export("igw_id", igw.id)
 pulumi.export("rtb_id", rtb.id)
 
