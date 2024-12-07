@@ -1,0 +1,29 @@
+
+# the below is deployd for pg db in private subnet in AZc (manual)
+services:
+  postgres: 
+    build: 
+      context: . 
+      dockerfile: ./pg-db/Dockerfile
+    image: todoapp-pg-image
+    container_name: todo_app_pg_cont_1
+    volumes: 
+      - dev_todoapp_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    env_file: 
+      - ./.envs/.dev/.postgres 
+    networks: 
+      - dev-todoapp-service-network
+
+
+networks: 
+  dev-todoapp-service-network:
+    external: true 
+
+volumes: 
+  dev_todoapp_postgres_data: {}
+
+
+#  sudo docker compose -p todoapp-dev -f dev.yml up --build -d --remove-orphans
+# sudo docker compose -p todoapp-dev -f dev.yml down 
