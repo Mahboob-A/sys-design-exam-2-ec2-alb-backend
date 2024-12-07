@@ -14,7 +14,47 @@ private_subnet_1_cidr = "10.10.3.0/24"
 private_subnet_2_cidr = "10.10.4.0/24"
 private_subnet_3_cidr = "10.10.5.0/24"
 
-# vpc 
+# A General overview 
+"""
+1 vpc
+
+2 public subnets: 
+    - 1st subnet: for alb, bastion server to ssh into provate subnet's ec2 instances, and client app 
+    - 2nd subnet: for alb 
+    
+3 private subnets:
+    - 1st: for django app 
+    - 2nd for django app 
+    - 3rd for pg db 
+ 
+1 igw
+
+1 public and 1 private rtb  
+
+4 ec2 instances: 
+    - 1 for bastion server and client app (public sn-1), 2 for django app (private-sn-1 and 2), 1 for pg db (private-sn-3)
+
+4 sg 
+1 nat 
+1 alb 
+1 target group
+1 listener
+1 key pair  
+
+and all other netwokring association
+
+flow: 
+
+ssh from local host into bastion. 
+from bastion only, ssh into 3 private-sn instances 
+app servers only receive traffic from alb 
+db only entertain app server cidr 
+
+please take a look below to learn more
+
+"""
+
+# vpc
 vpc = aws.ec2.Vpc(
     f"{env}-vpc",
     cidr_block=cidr_block,
