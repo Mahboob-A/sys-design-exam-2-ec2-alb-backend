@@ -2,22 +2,19 @@ import pulumi
 import pulumi_aws as aws
 
 config = pulumi.Config()
-# env = config.require("environment")  or "poridhi-exam-dev" # e.g., dev, staging, prod
-# region = config.get("region") or "ap-southeast-1"
-# public_ip = config.require("public_ip")  # Restrict SSH access (Your public IP address)
 
 region = "ap-southeast-1"
 env = "exam-dev"
-cidr_block = "10.10.0.0/16"  # Main CIDR block for VPC
+cidr_block = "10.10.0.0/16"  # vpc cidr 
 
-public_subnet_1_cidr = "10.10.1.0/24"    # bastion server in this sn 
+public_subnet_1_cidr = "10.10.1.0/24"    # bastion server in this sn, also the client app is deployed. 
 public_subnet_2_cidr = "10.10.2.0/24"
 
 private_subnet_1_cidr = "10.10.3.0/24"
 private_subnet_2_cidr = "10.10.4.0/24"
 private_subnet_3_cidr = "10.10.5.0/24"
 
-# VPC
+# vpc 
 vpc = aws.ec2.Vpc(
     f"{env}-vpc",
     cidr_block=cidr_block,
@@ -26,7 +23,7 @@ vpc = aws.ec2.Vpc(
     tags={"Name": f"{env}-vpc"},
 )
 
-# Subnets - publix sbnets in two AZs
+# subnet - publix sbnets in two AZs
 public_subnet_1 = aws.ec2.Subnet(
     f"{env}-public-sn-1",
     vpc_id=vpc.id,
