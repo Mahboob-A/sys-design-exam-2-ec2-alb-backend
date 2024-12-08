@@ -1,0 +1,5 @@
+POSTGRES_USER=any user name 
+POSTGRES_PASSWORD=any password
+POSTGRES_HOST=private ip of the database instance eg: 10.10.5.152
+POSTGRES_PORT=5432
+POSTGRES_DB=any database name

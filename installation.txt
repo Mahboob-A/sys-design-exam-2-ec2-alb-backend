@@ -1,0 +1,25 @@
+# steps to recreate the envirnment
+one need to add the envs in teh server as per their own as per the .envs-examples/.dev/.django or .postgres
+
+1. Create a ssh keygen 
+
+2. add the keygen public key in the "key_pair" in pulumi key pair attachment. 
+
+3. run pulumi up 
+
+4. ssh from host to the bastion server using its public ip | use agent forwardgin for easy access 
+
+5. ssh into the database instance using the private ip
+
+6. update and install docker envirnment 
+    6.1. create teh necessary files follwoing the db-dev.yml and /docker/dev/postgres files and envs. 
+    6.2. add teh envs data, the file strutcure as per the db-dev.yml (see teh .envs-examples/.dev/.postgres)
+    6.2. follow the file path as per db-dev.yml 
+    6.2. run teh db-dev.yml to run the database 
+
+7. ssh into other django servers using the private ip 
+    7.1. update and install docker envirnment
+    7.2. create teh resourcs following the file path as per dev.yml and /docker/dev/django and /docker/dev/nginx files.
+    7.3. add the datbase private ip as teh host for the .postgres env file
+    7.4. run the dev.yml to run the django server by docker compose using makefile  
+    7.5. see  .envs-examples/.dev/.postgres for env file structure

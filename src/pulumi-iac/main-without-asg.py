@@ -4,7 +4,7 @@ import pulumi_aws as aws
 config = pulumi.Config()
 
 region = "ap-southeast-1"
-env = "todo-infra-dev"
+env = "exam-dev"
 cidr_block = "10.10.0.0/16"  # vpc cidr
 
 public_subnet_1_cidr = (
@@ -42,24 +42,19 @@ private_subnet_3_cidr = "10.10.5.0/24"
 1 target group
 1 listener
 1 key pair  
-1 asg 
 
 and all other netwokring association
 
 flow: 
 
 ssh from local host into bastion. 
-for availability - from bastion only, ssh into 3 private-sn instances in three different subnets 
+from bastion only, ssh into 3 private-sn instances 
 app servers only receive traffic from alb 
 db only entertain app server cidr 
-for scalability - asg for auto scaling that is attached to the alb 
-and all other netwokring association
 
 please take a look below to learn more
 
 """
-
-######################################## BEGIN of Script ########################################
 
 # vpc
 vpc = aws.ec2.Vpc(
@@ -304,7 +299,7 @@ ubuntu_ami_id = aws.ec2.get_ami(
 
 key_pair = aws.ec2.KeyPair(
     f"{env}-keyname",
-    key_name="aws-infra-todo-app-keypair",
+    key_name="poridhi-exam-ec2-keypair",
     public_key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCQWXN6x3aCo5J7YKtq+yuDqiK5MT4In46TO4fuWWBhZuyB1GUa/uov0Nzu8+IjS/7hMvRZuhbMDe1olJuPHc0vPpuORjsOac/46ayZ02Mu7RIzGVhA0Z+dSobHkO4+hVc2HduhXWnvhYQfClV1ozvNctQhe+xCDiCFScC201vZAHczLY4ak9PNkN/qEf/I47E+VOp+BD53ld90GoiK27wExX0Q5EUXbn7ATznHA7RRP6vsyt7wL7RCOE3quxsjNvaS3et00mG9dpN+CEYemlFXii8lopHMpJV30+96ypbPyVLXGjhVd8V7mTvQJoHgsYS36R/gal+TieeEVD7YG/CD mehboob@pop-os",
 )
 
@@ -406,87 +401,6 @@ listener = aws.lb.Listener(
     tags={"Name": f"{env}-listener"},
 )
 
-# asg
-# user data for asg lt (praepares teh environemnt for new instance, installes the todo app and rungs the docker compose)
-user_data = """#!/bin/bash
-set -o errexit
-set -o nounset
-
-sudo apt update -y
-sudo apt upgrade -y
-sudo apt install -y python3 python3-pip git nginx curl
-sudo apt install -y ca-certificates curl gnupg
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt update -y
-sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-sudo usermod -aG docker ubuntu
-newgrp docker
-
-export DATABASE_URL="postgres://tododbuser:todopgpass123@10.10.5.10:5432/tododb"
-cd /home/ubuntu/
-git clone https://github.com/Mahboob-A/sys-design-scalable-aws-env-backend.git
-cd src/
-docker compose -p todo_app_backend -f dev.yml up --build -d --remove-orphans &
-"""
-
-# launch template
-launch_template = aws.ec2.LaunchTemplate(
-    f"{env}-django-app-lt",
-    name=f"{env}-django-app-lt",
-    image_id=ubuntu_ami_id,
-    instance_type="t2.micro",  
-    key_name=key_pair.key_name,
-    user_data=user_data, 
-    network_interfaces=[
-        {
-            "associate_public_ip_address": False,
-            "security_groups": [app_security_group.id],
-            "subnet_id": private_subnet_1.id,
-        }
-    ],
-    tags={"Name": f"{env}-django-app-lt"},
-)
-
-# asg
-asg = aws.autoscaling.Group(
-    f"{env}-django-app-asg",
-    vpc_zone_identifiers=[private_subnet_1.id, private_subnet_2.id],
-    desired_capacity=2,
-    min_size=1,
-    max_size=5,
-    launch_template={
-        "id": launch_template.id,
-        "version": "$Latest",
-    },
-    target_group_arns=[target_group.arn],  
-    tags=[
-        {
-            "key": "Name",
-            "value": f"{env}-django-instance-managad-by-asg",
-            "propagate_at_launch": True,
-        }
-    ],
-)
-
-# policirs
-scale_up_policy = aws.autoscaling.Policy(
-    f"{env}-django-asg-scale-up",
-    scaling_adjustment=1,
-    adjustment_type="ChangeInCapacity",
-    cooldown=300,
-    autoscaling_group_name=asg.name,
-)
-
-scale_down_policy = aws.autoscaling.Policy(
-    f"{env}-django-asg-scale-down",
-    scaling_adjustment=-1,
-    adjustment_type="ChangeInCapacity",
-    cooldown=300,
-    autoscaling_group_name=asg.name,
-)
-
 
 # infra
 pulumi.export("vpc_id", vpc.id)
@@ -506,12 +420,3 @@ pulumi.export("target_group_id", target_group.id)
 pulumi.export("alb.id", alb.id)
 pulumi.export("alb_dns_name", alb.dns_name)
 pulumi.export("listener_id", listener.id)
-
-# asg
-pulumi.export("asg_name", asg.name)
-pulumi.export("asg_arn", asg.arn)
-pulumi.export("asg_id", asg.id)
-pulumi.export("asg_launch_template_id", launch_template.id)
-
-
-######################################## END of Script ########################################
