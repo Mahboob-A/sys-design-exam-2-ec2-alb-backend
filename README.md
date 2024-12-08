@@ -161,3 +161,16 @@ This infrastructure is designed to be scalable, fault-tolerant, and secure, read
 3.  It will create all the necessary AWS resources: VPC, subnets, security groups, instances, load balancer, and more.
 4. Then you have to follow the `installation.txt` to deploy the todo app in the environment.
 
+
+## Images 
+
+<br>
+
+![Screenshot from 2024-12-07 13-35-13](https://github.com/user-attachments/assets/970ab8bc-d391-4e97-8127-cc063101f1b1)
+
+
+![Screenshot from 2024-12-07 10-22-01](https://github.com/user-attachments/assets/ac742cc0-97cf-4765-a80d-08f081183ed0)
+
+![Screenshot from 2024-12-07 13-39-34](https://github.com/user-attachments/assets/631f1e43-0c68-4f16-bd39-5e29c07c039d)
+
+![Screenshot from 2024-12-07 18-34-33](https://github.com/user-attachments/assets/4c0d8a96-2792-4fd8-8d54-293bb2b9c6de)
